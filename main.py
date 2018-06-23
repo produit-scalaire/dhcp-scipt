@@ -11,6 +11,8 @@ api_password = config.get('Re2o', 'password')
 api_username = config.get('Re2o', 'username')
 
 def regen_dhcp(api_client):
+    host_mac_ip = {}
+
     for hmi in api_client.list_hostmacip():
         if hmi['extension'] not in host_mac_ip.keys():
             host_mac_ip[hmi['extension']] = []
@@ -35,7 +37,6 @@ def regen_dhcp(api_client):
         with open(filename, 'w+') as f:
             f.write(dhcp_leases_content)
 
-host_mac_ip = {}
 api_client = Re2oAPIClient(api_hostname, api_username, api_password)
 
 client_hostname = socket.gethostname().split('.', 1)[0]
