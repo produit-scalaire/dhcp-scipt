@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from configparser import ConfigParser
 import socket
 
@@ -13,7 +14,7 @@ api_username = config.get('Re2o', 'username')
 def regen_dhcp(api_client):
     host_mac_ip = {}
 
-    for hmi in api_client.list_hostmacip():
+    for hmi in api_client.view("dhcp/hostmacip/")['results']:
         if hmi['extension'] not in host_mac_ip.keys():
             host_mac_ip[hmi['extension']] = []
         host_mac_ip[hmi['extension']].append((hmi['hostname'],
@@ -41,9 +42,9 @@ api_client = Re2oAPIClient(api_hostname, api_username, api_password)
 
 client_hostname = socket.gethostname().split('.', 1)[0]
 
-for service in api_client.list_servicesregen():
-    if service['hostname'] == client_hostname and \
-            service['service_name'] == 'dhcp' and \
-            service['need_regen']:
+for service in api_client.view("services/regen")['results']:
+    #if service['hostname'] == client_hostname and \
+    #        service['service_name'] == 'dhcp' and \
+    #        service['need_regen']:
         regen_dhcp(api_client)
         api_client.patch(service['api_url'], data={'need_regen': False})
