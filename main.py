@@ -34,7 +34,7 @@ def regen_dhcp(api_client):
                 ipv4=ipv4
             ) for hostname, mac_address, ipv4 in hmi_list)
 
-        filename = 'dhcp{extension}.list'.format(extension=extension)
+        filename = 'generated/dhcp{extension}.list'.format(extension=extension)
         with open(filename, 'w+') as f:
             f.write(dhcp_leases_content)
 
