@@ -43,8 +43,8 @@ api_client = Re2oAPIClient(api_hostname, api_username, api_password)
 client_hostname = socket.gethostname().split('.', 1)[0]
 
 for service in api_client.list("services/regen"):
-    #if service['hostname'] == client_hostname and \
-    #        service['service_name'] == 'dhcp' and \
-    #        service['need_regen']:
-        regen_dhcp(api_client)
-        api_client.patch(service['api_url'], data={'need_regen': False})
+    if service['hostname'] == client_hostname and \
+            service['service_name'] == 'dhcp' and \
+            service['need_regen']:
+            regen_dhcp(api_client)
+            api_client.patch(service['api_url'], data={'need_regen': False})
