@@ -29,11 +29,12 @@ def regen_dhcp(api_client):
     host_mac_ip = {}
 
     for hmi in api_client.list("dhcp/hostmacip/"):
-        if hmi['extension'] not in host_mac_ip.keys():
-            host_mac_ip[hmi['extension']] = []
-        host_mac_ip[hmi['extension']].append((hmi['hostname'],
-                                              hmi['mac_address'],
-                                              hmi['ipv4']))
+        if 'ipv4' in hmi:
+            if hmi['extension'] not in host_mac_ip.keys():
+                host_mac_ip[hmi['extension']] = []
+            host_mac_ip[hmi['extension']].append((hmi['hostname'],
+                                                  hmi['mac_address'],
+                                                  hmi['ipv4']))
 
     template = ("host {hostname}{extension} {{\n"
                 "    hardware ethernet {mac_address};\n"
