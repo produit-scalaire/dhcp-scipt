@@ -56,7 +56,7 @@ def generate_file(template, host_mac_ip, file_prefix):
 
         filename = path+'/generated/{file_prefix}{key}.list'.format(
                 key=key,
-                file_prefix=file_prefix)
+                file_prefix=file_prefix).lower().replace(" ", "_")
         with open(filename, 'w+') as f:
             f.write(dhcp_leases_content)
 
