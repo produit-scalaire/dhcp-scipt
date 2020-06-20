@@ -39,7 +39,8 @@ def build_hmi(host_mac_ip, api_res, key):
     for hmi in api_res:
         if hmi[key] not in host_mac_ip.keys():
             host_mac_ip[hmi[key]] = []
-        host_mac_ip[hmi[key]].append((hmi['hostname'],
+        if 'ipv4' in hmi:
+            host_mac_ip[hmi[key]].append((hmi['hostname'],
                                       hmi['extension'],
                                       hmi['mac_address'],
                                       hmi['ipv4']))
