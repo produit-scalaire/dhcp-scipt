@@ -53,12 +53,7 @@ def update_bdd(host_mac_ip):
     cursor.execute("DELETE FROM hosts")
     for key, hmi_list in host_mac_ip.items():
         for hostname, extension, mac_address, ipv4 in hmi_list:
-            cursor.execute("INSERT INTO hosts (dhcp_identifier, dhcp_identifier_type, ipv4_address, hostname) \
-            VALUES (DECODE(REPLACE(%s, ':', ''), 'hex'), \ 
-            (SELECT type FROM host_identifier_type WHERE name=%s), \ 
-            (SELECT (%s::inet - '0.0.0.0'::inet)), \ 
-            %s %s)", \ 
-            (mac_address, 'hw-address', ipv4, hostname, extension))
+            cursor.execute("INSERT INTO hosts (dhcp_identifier, dhcp_identifier_type, ipv4_address, hostname) VALUES (DECODE(REPLACE(%s, ':', ''), 'hex'), (SELECT type FROM host_identifier_type WHERE name=%s), (SELECT (%s::inet - '0.0.0.0'::inet)), %s %s)", (mac_address, 'hw-address', ipv4, hostname, extension))
     conn.commit()
 
 
