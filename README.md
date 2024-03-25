@@ -1,5 +1,5 @@
 ## Re2o - DHCP
-This service uses Re2o API to generate DHCP leases files
+This service uses Re2o API to update Kea DHCP's postgresql database
 
 ## Requirements
 
