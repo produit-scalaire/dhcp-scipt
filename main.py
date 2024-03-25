@@ -1,12 +1,20 @@
 #!/usr/bin/env python3
 from configparser import ConfigParser
 import socket
-
+import psycopg2
 from re2oapi import Re2oAPIClient
 
 import sys
 import os
 import subprocess
+
+conn = psycopg2.connect(
+          user = "kea",
+          password = "plopiplop",
+          host = "localhost",
+          database = "leasesdhcp"
+    )
+cursor = conn.cursor()
 
 path =(os.path.dirname(os.path.abspath(__file__)))
 
@@ -36,6 +44,7 @@ def regen_dhcp(api_client):
     generate_file(template, host_mac_ip_type, "dhcp.ip_type.")
 
 def build_hmi(host_mac_ip, api_res, key):
+    cursor.execute("DELETE FROM hosts")
     for hmi in api_res:
         if hmi[key] not in host_mac_ip.keys():
             host_mac_ip[hmi[key]] = []
@@ -44,6 +53,8 @@ def build_hmi(host_mac_ip, api_res, key):
                                       hmi['extension'],
                                       hmi['mac_address'],
                                       hmi['ipv4']))
+            cursor.execute("INSERT INTO hosts (hmi['mac_address'], 'hw-hardware', hmi['ipv4'], hmi['hostname'] + hmi['extension']) VALUES (DECODE(REPLACE(%s, ':', ''), 'hex'), (SELECT type FROM host_identifier_type WHERE name=%s), (SELECT (%s::inet - '0.0.0.0'::inet)), %s)", (hmi['mac_address'], 'hw-address', hmi['ipv4'], hmi['hostname']))
+    conn.commit()
 
 
 def generate_file(template, host_mac_ip, file_prefix):
@@ -66,11 +77,11 @@ def reload_server():
     """Relance le serveur DHCP."""
     try:
         subprocess.check_output(
-          ['/bin/systemctl', 'restart', 'isc-dhcp-server'],
+          ['/bin/systemctl', 'restart', 'isc-kea-dhcp4-server'],
             stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as err:
         print(
-            "Erreur lors du redémarrage de isc-dhcp-server.\n"
+            "Erreur lors du redémarrage de isc-kea-dhcp4-server.\n"
             "Code de retour: %s, Sortie:\n%s",
             err.returncode, err.output.decode())
         print(err)
@@ -80,7 +91,7 @@ def check_syntax():
     """Vérifie la configuration du serveur DHCP."""
     try:
         subprocess.check_output(
-            ['/usr/sbin/dhcpd', '-t', '-cf', '/etc/dhcp/dhcpd.conf'],
+            ['/usr/kea/dhcpd', '-t', '/etc/kea/kea-dhcp4.conf'],
             stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as err:
         print(
@@ -105,5 +116,4 @@ for service in api_client.list("services/regen/"):
             regen_dhcp(api_client)
             if check_syntax():
                 api_client.patch(service['api_url'], data={'need_regen': False})
-                reload_server()
 
