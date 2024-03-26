@@ -57,20 +57,6 @@ def update_bdd(host_mac_ip):
     conn.commit()
 
 
-def reload_server():
-    """Relance le serveur DHCP."""
-    try:
-        subprocess.check_output(
-          ['/bin/systemctl', 'restart', 'isc-kea-dhcp4-server'],
-            stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError as err:
-        print(
-            "Erreur lors du redémarrage de isc-kea-dhcp4-server.\n"
-            "Code de retour: %s, Sortie:\n%s",
-            err.returncode, err.output.decode())
-        print(err)
-
-
 api_client = Re2oAPIClient(api_hostname, api_username, api_password, use_tls=True)
 
 client_hostname = socket.gethostname().split('.', 1)[0]
