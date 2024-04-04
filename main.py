@@ -10,7 +10,7 @@ import subprocess
 
 conn = psycopg2.connect(
           user = "kea",
-          password = "plopiplop",
+          password = "password-bdd",
           host = "localhost",
           database = "leasesdhcp"
     )
